@@ -1,21 +1,37 @@
 ---
 - name: user
   hosts: demo
-  # vars_prompt:
-  #   - name: user
-  #     prompt: "Введите пользователя"
-  #     private: no
-  # vars_files:
-  #   - ./my_vars.yml 
+  # any_errors_fatal: true
   tasks: 
-    - name: Create user
-      vars:
-        - user: alaricode
-      user:
-        name: "{{ user }}"
-        state: present
+    # - name: Print all available facts
+    #   ansible.builtin.debug:
+    #     var: ansible_facts['distribution']
+    - name: Preconfig block
+      block:
+        - name: Create user
+          vars:
+            - user: alaricode
+          user:
+            name: "{{ user }}"
+            state: present
+          register: error
+          ignore_errors: true
+        - name: Install curl
+          apt:
+            name: curl
+            update_cache: true
+          register: error
+        # - name: Fail on FAILED
+        #   command: echo "FAILED"
+        #   register: command_result
+        #   failed_when: "'FAILED' in command_result.stdout"
       become: true
-      debugger: always
-    #   register: out
-    # - debug: 
-    #     var: out
+      when: ansible_facts['distribution'] == 'Ubuntu'
+      rescue:
+        - name: Some error print
+          debug:
+            var: error
+      always:
+        - name: Reboot
+          debug:
+            msg: "Rebooting"
