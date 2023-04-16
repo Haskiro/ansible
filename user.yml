@@ -9,9 +9,13 @@
   #   - ./my_vars.yml 
   tasks: 
     - name: Create user
-      # vars:
-      #   - user: alaricode
+      vars:
+        - user: alaricode
       user:
         name: "{{ user }}"
         state: present
       become: true
+      debugger: always
+    #   register: out
+    # - debug: 
+    #     var: out
