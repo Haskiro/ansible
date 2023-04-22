@@ -1,0 +1,6 @@
+---
+argument_specs:
+  main:
+    short_description: Настройка серверов для работы с docker
+    author: Pavel Kondratyev
+allow_duplicates: true
