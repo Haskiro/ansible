@@ -6,14 +6,17 @@
       ansible.builtin.apt_repository:
         repo: "deb http://us.archive.ubuntu.com/ubuntu/ {{ ansible_distribution_release }} universe"
         state: present
+
     - name: Установка дополнительных пакетов
       ansible.builtin.apt:
         name:
           - ca-certificates
           - curl
           - gnupg
+          - python3-pip
         update-cache: true
         cache_valid_time: 86400
+
     - name: Добавление директории /etc/apt/keyrings
       ansible.builtin.file:
         path: /etc/apt/keyrings
@@ -24,6 +27,7 @@
         url: https://download.docker.com/linux/ubuntu/gpg
         state: present
         keyring: /etc/apt/keyrings/docker.gpg
+
     - name: Установка стабильного репозитория репозитория
       ansible.builtin.apt_repository:
         repo: >
@@ -42,6 +46,7 @@
           - containerd.io
           - docker-buildx-plugin
         update_cache: true
+
     - name: Проверка, что docker установлен и перезагружен
       ansible.builtin.service:
         name: docker
@@ -65,6 +70,13 @@
 - name: Проверка output установки docker-compose
   ansible.builtin.debug:
     var: out
+
+- name: Настройка дополнительных пакетов python
+  block:
+    - name: Установка pip пакетов
+      ansible.builtin.pip:
+        name: docker
+
 - name: Завершение установки
   become: true
   block:
